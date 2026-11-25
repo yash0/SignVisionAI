@@ -1,41 +1,59 @@
-
 import cv2
 import mediapipe as mp
 
 
+class HandDetectionResult:
+    """
+    Small compatibility wrapper so the rest of
+    SignVision AI can continue using:
+
+        result.hand_landmarks
+    """
+
+    def __init__(self, hand_landmarks):
+        self.hand_landmarks = hand_landmarks
+
+
 class HandDetector:
 
-    def __init__(self, model_path, num_hands=1):
+    def __init__(
+        self,
+        model_path=None,
+        num_hands=1
+    ):
 
-        BaseOptions = mp.tasks.BaseOptions
-        HandLandmarker = mp.tasks.vision.HandLandmarker
-        HandLandmarkerOptions = mp.tasks.vision.HandLandmarkerOptions
-        VisionRunningMode = mp.tasks.vision.RunningMode
+        self.mp_hands = mp.solutions.hands
 
-        options = HandLandmarkerOptions(
-            base_options=BaseOptions(
-                model_asset_path=model_path
-            ),
-            running_mode=VisionRunningMode.IMAGE,
-            num_hands=num_hands,
-            min_hand_detection_confidence=0.5,
-            min_hand_presence_confidence=0.5
-        )
-
-        self.detector = (
-            HandLandmarker.create_from_options(options)
+        self.detector = self.mp_hands.Hands(
+            static_image_mode=False,
+            max_num_hands=num_hands,
+            model_complexity=0,
+            min_detection_confidence=0.5,
+            min_tracking_confidence=0.5
         )
 
     def detect(self, frame):
 
-        rgb = cv2.cvtColor(
+        rgb_frame = cv2.cvtColor(
             frame,
             cv2.COLOR_BGR2RGB
         )
 
-        mp_image = mp.Image(
-            image_format=mp.ImageFormat.SRGB,
-            data=rgb
+        rgb_frame.flags.writeable = False
+
+        results = self.detector.process(
+            rgb_frame
         )
 
-        return self.detector.detect(mp_image)
+        landmarks = []
+
+        if results.multi_hand_landmarks:
+
+            for hand in results.multi_hand_landmarks:
+                landmarks.append(
+                    hand.landmark
+                )
+
+        return HandDetectionResult(
+            landmarks
+        )
