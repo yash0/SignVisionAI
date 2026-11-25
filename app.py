@@ -319,28 +319,34 @@ with camera_col:
     st.subheader("📷 Live Recognition")
 
     webrtc_ctx = webrtc_streamer(
-        key="signvision",
-        mode=WebRtcMode.SENDRECV,
-        video_processor_factory=signProcessor,
-        media_stream_constraints={
-            "video": {
-                "width": {"ideal":640},
-                "height": {"ideal":480},
-                "framerate": {"ideal":20}
-            }.
-            "audio": False
+
+    key="signvision",
+
+    mode=WebRtcMode.SENDRECV,
+
+    video_processor_factory=SignProcessor,
+
+    media_stream_constraints={
+        "video": {
+            "width": {"ideal": 640},
+            "height": {"ideal": 480},
+            "frameRate": {"ideal": 20}
         },
-        rtc_configuration={
-            "iceServers":[
-                {
-                    "urls":[
-                        "stun:stun.l.google.com:19302"
-                    ]
-                }
-            ]
-        },
-        async_processing=True
-    )
+        "audio": False
+    },
+
+    rtc_configuration={
+        "iceServers": [
+            {
+                "urls": [
+                    "stun:stun.l.google.com:19302"
+                ]
+            }
+        ]
+    },
+
+    async_processing=True
+)
 
 
 with info_col:
