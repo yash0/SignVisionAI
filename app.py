@@ -39,11 +39,6 @@ COLUMNS_PATH = os.path.join(
     "feature_columns.pkl"
 )
 
-HAND_MODEL_PATH = os.path.join(
-    BASE_DIR,
-    "models",
-    "hand_landmarker.task"
-)
 
 
 # =====================================================
@@ -149,7 +144,7 @@ class SignProcessor(VideoProcessorBase):
     def __init__(self):
 
         self.detector = HandDetector(
-            HAND_MODEL_PATH
+            num_hands=1
         )
 
         self.classifier = SignClassifier(
